@@ -1,45 +1,65 @@
-# [Project name]
+# SIGOS — Sistema de Gestión Operativa de Sublicolor C.A.
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Sistema de gestión interna para una tienda de impresiones y diseño gráfico por sublimación. Cubre inventario, CRM, pedidos, producción y usuarios.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/api-server run dev` — inicia el API server (puerto asignado por workflow)
+- `pnpm --filter @workspace/sigos run dev` — inicia el frontend React+Vite
+- `pnpm run typecheck` — typecheck completo en todos los paquetes
+- `pnpm run build` — typecheck + build todos los paquetes
+- `pnpm --filter @workspace/api-spec run codegen` — regenera hooks React Query y schemas Zod desde el spec OpenAPI
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React 18 + Vite + TailwindCSS + shadcn/ui + Recharts + Wouter
+- Backend: Express 5 (API server compartido)
+- Almacenamiento: In-memory (MVP local) — seeded con datos de Sublicolor C.A.
+- Validación: Zod v4 (generada desde OpenAPI spec via Orval)
+- API codegen: Orval (desde `lib/api-spec/openapi.yaml`)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `lib/api-spec/openapi.yaml` — fuente de verdad de todos los contratos API
+- `lib/api-client-react/src/generated/` — hooks React Query generados (no editar manualmente)
+- `lib/api-zod/src/generated/` — schemas Zod de validación (no editar manualmente)
+- `artifacts/api-server/src/data/store.ts` — almacén in-memory con datos semilla
+- `artifacts/api-server/src/routes/` — route handlers Express (dashboard, inventario, clientes, pedidos, produccion, usuarios)
+- `artifacts/sigos/src/` — frontend React SPA con módulos por página
+
+## Módulos del sistema
+
+| Módulo | Ruta | Descripción |
+|--------|------|-------------|
+| Dashboard | `/` | KPIs en tiempo real: pedidos en producción, insumos críticos, clientes, ingresos |
+| Inventario | `/inventario` | Catálogo de insumos (SKU) + historial de movimientos de stock |
+| Ventas y CRM | `/ventas` | Directorio de clientes + gestión de órdenes/pedidos |
+| Producción | `/produccion` | Órdenes de producción con estados (Pendiente → En Proceso → Finalizado) |
+| Usuarios | `/usuarios` | Gestión de usuarios y roles (Admin, Produccion, Ventas, Inventario) |
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
+- **MVP local sin base de datos**: El almacenamiento es in-memory en el API server, seeded con los datos originales de Sublicolor C.A. Los datos se reinician al reiniciar el server. Para persistencia en producción, migrar a PostgreSQL con Drizzle (ya configurado en `lib/db/`).
+- **Validación con Zod generada**: Todos los route handlers usan los schemas Zod de `@workspace/api-zod` para validar inputs antes de procesar, garantizando integridad de datos y cumplimiento del contrato OpenAPI.
+- **In-memory + movimiento de stock**: `POST /inventario/movimientos` aplica el movimiento (Entrada/Salida/Ajuste) directamente al stock del ítem y actualiza la bandera `enStockCritico` automáticamente.
+- **OpenAPI-first**: El spec en `lib/api-spec/openapi.yaml` es la única fuente de verdad. Cambios en endpoints requieren: editar el spec → correr codegen → implementar el route handler.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Prioridad en funcionalidad sobre cualquier otra métrica
+- Sistema en español (Venezuela)
+- Sin base de datos para pruebas locales iniciales
+- Pilares tecnológicos: HTML5, CSS, JavaScript/TypeScript, JSON
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Después de cambiar `lib/api-spec/openapi.yaml`, siempre correr: `pnpm --filter @workspace/api-spec run codegen`
+- El API server usa almacenamiento in-memory: reiniciarlo borra los cambios hechos en runtime
+- Para verificar la app con curl: usar `localhost:80/api/...` (no el puerto directo del service)
+- No usar `pnpm run dev` en la raíz del workspace
 
 ## Pointers
 
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Ver skill `pnpm-workspace` para estructura del workspace, TypeScript y paquetes compartidos
+- Ver `lib/db/` para migrar a PostgreSQL con Drizzle cuando se requiera persistencia

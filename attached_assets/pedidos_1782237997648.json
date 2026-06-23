@@ -1,0 +1,22 @@
+[
+  {
+    "id": "PED-1001",
+    "idCliente": "CLI-001",
+    "fechaRegistro": "2026-06-02",
+    "estadoProduccion": "En Producción",
+    "estadoPago": "Abonado",
+    "total": 150.00,
+    "detalles": [
+      {
+        "sku": "TZ-001",
+        "cantidad": 50,
+        "precioUnitario": 2.50
+      },
+      {
+        "sku": "TN-004",
+        "cantidad": 1,
+        "precioUnitario": 25.00
+      }
+    ]
+  }
+]

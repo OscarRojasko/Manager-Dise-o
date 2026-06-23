@@ -2,14 +2,28 @@ openapi: 3.1.0
 info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
-  description: API specification
+  version: 1.0.0
+  description: SIGOS – Sublicolor C.A. Management System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: KPI summary operations
+  - name: inventario
+    description: Inventory management
+  - name: movimientos
+    description: Stock movement operations
+  - name: clientes
+    description: CRM client directory
+  - name: pedidos
+    description: Order management
+  - name: produccion
+    description: Production order management
+  - name: usuarios
+    description: User management
 paths:
   /healthz:
     get:
@@ -24,6 +38,477 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get KPI dashboard summary
+      responses:
+        "200":
+          description: Dashboard KPIs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /inventario:
+    get:
+      operationId: getInventario
+      tags: [inventario]
+      summary: List all inventory items
+      parameters:
+        - name: categoria
+          in: query
+          schema:
+            type: string
+          description: Filter by category
+      responses:
+        "200":
+          description: List of inventory items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ItemInventario"
+    post:
+      operationId: createItemInventario
+      tags: [inventario]
+      summary: Create a new inventory item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ItemInventarioInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ItemInventario"
+        "400":
+          description: Validation error
+
+  /inventario/{sku}:
+    put:
+      operationId: updateItemInventario
+      tags: [inventario]
+      summary: Update an inventory item
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ItemInventarioUpdate"
+      responses:
+        "200":
+          description: Updated item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ItemInventario"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteItemInventario
+      tags: [inventario]
+      summary: Delete an inventory item
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /inventario/movimientos:
+    get:
+      operationId: getMovimientos
+      tags: [movimientos]
+      summary: List all stock movements
+      parameters:
+        - name: sku
+          in: query
+          schema:
+            type: string
+          description: Filter by SKU
+      responses:
+        "200":
+          description: List of movements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Movimiento"
+    post:
+      operationId: createMovimiento
+      tags: [movimientos]
+      summary: Register a stock movement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MovimientoInput"
+      responses:
+        "201":
+          description: Movement created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Movimiento"
+        "400":
+          description: Validation error
+
+  /clientes:
+    get:
+      operationId: getClientes
+      tags: [clientes]
+      summary: List all clients
+      parameters:
+        - name: tipo
+          in: query
+          schema:
+            type: string
+          description: Filter by type (Natural or Jurídico)
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cliente"
+    post:
+      operationId: createCliente
+      tags: [clientes]
+      summary: Create a new client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClienteInput"
+      responses:
+        "201":
+          description: Created client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cliente"
+        "400":
+          description: Validation error
+
+  /clientes/{id}:
+    get:
+      operationId: getClienteById
+      tags: [clientes]
+      summary: Get a client by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Client details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cliente"
+        "404":
+          description: Not found
+    put:
+      operationId: updateCliente
+      tags: [clientes]
+      summary: Update a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClienteUpdate"
+      responses:
+        "200":
+          description: Updated client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cliente"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteCliente
+      tags: [clientes]
+      summary: Delete a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /pedidos:
+    get:
+      operationId: getPedidos
+      tags: [pedidos]
+      summary: List all orders
+      parameters:
+        - name: estadoProduccion
+          in: query
+          schema:
+            type: string
+          description: Filter by production status
+        - name: estadoPago
+          in: query
+          schema:
+            type: string
+          description: Filter by payment status
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pedido"
+    post:
+      operationId: createPedido
+      tags: [pedidos]
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PedidoInput"
+      responses:
+        "201":
+          description: Created order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+        "400":
+          description: Validation error
+
+  /pedidos/{id}:
+    get:
+      operationId: getPedidoById
+      tags: [pedidos]
+      summary: Get an order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+        "404":
+          description: Not found
+    put:
+      operationId: updatePedido
+      tags: [pedidos]
+      summary: Update an order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PedidoUpdate"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pedido"
+        "404":
+          description: Not found
+
+  /produccion:
+    get:
+      operationId: getProduccion
+      tags: [produccion]
+      summary: List all production records
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+          description: Filter by production state
+      responses:
+        "200":
+          description: List of production records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProduccionRecord"
+    post:
+      operationId: createProduccion
+      tags: [produccion]
+      summary: Create a production record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProduccionInput"
+      responses:
+        "201":
+          description: Created production record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProduccionRecord"
+        "400":
+          description: Validation error
+
+  /produccion/{id}:
+    put:
+      operationId: updateProduccion
+      tags: [produccion]
+      summary: Update production record status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProduccionUpdate"
+      responses:
+        "200":
+          description: Updated production record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProduccionRecord"
+        "404":
+          description: Not found
+
+  /usuarios:
+    get:
+      operationId: getUsuarios
+      tags: [usuarios]
+      summary: List all users
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Usuario"
+    post:
+      operationId: createUsuario
+      tags: [usuarios]
+      summary: Create a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioInput"
+      responses:
+        "201":
+          description: Created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "400":
+          description: Validation error
+
+  /usuarios/{id}:
+    put:
+      operationId: updateUsuario
+      tags: [usuarios]
+      summary: Update a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Usuario"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteUsuario
+      tags: [usuarios]
+      summary: Delete a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +519,407 @@ components:
       required:
         - status
 
+    DashboardSummary:
+      type: object
+      properties:
+        pedidosEnProduccion:
+          type: integer
+        insumosEnStockCritico:
+          type: integer
+        totalClientes:
+          type: integer
+        totalPedidos:
+          type: integer
+        totalIngresos:
+          type: number
+        pedidosPendientesPago:
+          type: integer
+        itemsCriticos:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItemInventario"
+        pedidosRecientes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Pedido"
+      required:
+        - pedidosEnProduccion
+        - insumosEnStockCritico
+        - totalClientes
+        - totalPedidos
+        - totalIngresos
+        - pedidosPendientesPago
+        - itemsCriticos
+        - pedidosRecientes
+
+    ItemInventario:
+      type: object
+      properties:
+        sku:
+          type: string
+        nombre:
+          type: string
+        categoria:
+          type: string
+        stockActual:
+          type: integer
+        stockMinimo:
+          type: integer
+        enStockCritico:
+          type: boolean
+      required:
+        - sku
+        - nombre
+        - categoria
+        - stockActual
+        - stockMinimo
+        - enStockCritico
+
+    ItemInventarioInput:
+      type: object
+      properties:
+        sku:
+          type: string
+        nombre:
+          type: string
+        categoria:
+          type: string
+        stockActual:
+          type: integer
+        stockMinimo:
+          type: integer
+      required:
+        - sku
+        - nombre
+        - categoria
+        - stockActual
+        - stockMinimo
+
+    ItemInventarioUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        categoria:
+          type: string
+        stockActual:
+          type: integer
+        stockMinimo:
+          type: integer
+
+    Movimiento:
+      type: object
+      properties:
+        id:
+          type: string
+        sku:
+          type: string
+        tipoMovimiento:
+          type: string
+          enum: [Entrada, Salida, Ajuste]
+        cantidad:
+          type: integer
+        fecha:
+          type: string
+        responsable:
+          type: string
+        observacion:
+          type: string
+      required:
+        - id
+        - sku
+        - tipoMovimiento
+        - cantidad
+        - fecha
+        - responsable
+        - observacion
+
+    MovimientoInput:
+      type: object
+      properties:
+        sku:
+          type: string
+        tipoMovimiento:
+          type: string
+          enum: [Entrada, Salida, Ajuste]
+        cantidad:
+          type: integer
+        responsable:
+          type: string
+        observacion:
+          type: string
+      required:
+        - sku
+        - tipoMovimiento
+        - cantidad
+        - responsable
+        - observacion
+
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: string
+        tipo:
+          type: string
+          enum: [Natural, Jurídico, Corporativo]
+        nombre:
+          type: string
+        documento:
+          type: string
+        contacto:
+          type: string
+        email:
+          type: string
+        direccion:
+          type: string
+      required:
+        - id
+        - tipo
+        - nombre
+        - documento
+        - contacto
+        - email
+        - direccion
+
+    ClienteInput:
+      type: object
+      properties:
+        tipo:
+          type: string
+          enum: [Natural, Jurídico, Corporativo]
+        nombre:
+          type: string
+        documento:
+          type: string
+        contacto:
+          type: string
+        email:
+          type: string
+        direccion:
+          type: string
+      required:
+        - tipo
+        - nombre
+        - documento
+        - contacto
+        - email
+        - direccion
+
+    ClienteUpdate:
+      type: object
+      properties:
+        tipo:
+          type: string
+          enum: [Natural, Jurídico, Corporativo]
+        nombre:
+          type: string
+        documento:
+          type: string
+        contacto:
+          type: string
+        email:
+          type: string
+        direccion:
+          type: string
+
+    DetallePedido:
+      type: object
+      properties:
+        sku:
+          type: string
+        cantidad:
+          type: integer
+        precioUnitario:
+          type: number
+      required:
+        - sku
+        - cantidad
+        - precioUnitario
+
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: string
+        idCliente:
+          type: string
+        fechaRegistro:
+          type: string
+        estadoProduccion:
+          type: string
+          enum: [Pendiente, En Producción, Listo, Entregado, Cancelado]
+        estadoPago:
+          type: string
+          enum: [Pendiente, Abonado, Pagado, Cancelado]
+        total:
+          type: number
+        observaciones:
+          type: ["string", "null"]
+        detalles:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetallePedido"
+      required:
+        - id
+        - idCliente
+        - fechaRegistro
+        - estadoProduccion
+        - estadoPago
+        - total
+        - observaciones
+        - detalles
+
+    PedidoInput:
+      type: object
+      properties:
+        idCliente:
+          type: string
+        estadoPago:
+          type: string
+          enum: [Pendiente, Abonado, Pagado, Cancelado]
+        total:
+          type: number
+        observaciones:
+          type: string
+        detalles:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetallePedido"
+      required:
+        - idCliente
+        - estadoPago
+        - total
+        - detalles
+
+    PedidoUpdate:
+      type: object
+      properties:
+        estadoProduccion:
+          type: string
+          enum: [Pendiente, En Producción, Listo, Entregado, Cancelado]
+        estadoPago:
+          type: string
+          enum: [Pendiente, Abonado, Pagado, Cancelado]
+        total:
+          type: number
+        observaciones:
+          type: string
+        detalles:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetallePedido"
+
+    ProduccionRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        idPedido:
+          type: string
+        descripcion:
+          type: string
+        estado:
+          type: string
+          enum: [Pendiente, En Proceso, Finalizado, Cancelado]
+        operario:
+          type: string
+        fechaInicio:
+          type: string
+        fechaFin:
+          type: ["string", "null"]
+        observaciones:
+          type: ["string", "null"]
+      required:
+        - id
+        - idPedido
+        - descripcion
+        - estado
+        - operario
+        - fechaInicio
+        - fechaFin
+        - observaciones
+
+    ProduccionInput:
+      type: object
+      properties:
+        idPedido:
+          type: string
+        descripcion:
+          type: string
+        operario:
+          type: string
+        observaciones:
+          type: string
+      required:
+        - idPedido
+        - descripcion
+        - operario
+
+    ProduccionUpdate:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum: [Pendiente, En Proceso, Finalizado, Cancelado]
+        operario:
+          type: string
+        observaciones:
+          type: string
+        fechaFin:
+          type: string
+
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: string
+        nombre:
+          type: string
+        rol:
+          type: string
+          enum: [Admin, Produccion, Ventas, Inventario]
+        email:
+          type: string
+        estado:
+          type: string
+          enum: [Activo, Inactivo]
+      required:
+        - id
+        - nombre
+        - rol
+        - email
+        - estado
+
+    UsuarioInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+        rol:
+          type: string
+          enum: [Admin, Produccion, Ventas, Inventario]
+        email:
+          type: string
+        estado:
+          type: string
+          enum: [Activo, Inactivo]
+      required:
+        - nombre
+        - rol
+        - email
+        - estado
+
+    UsuarioUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        rol:
+          type: string
+          enum: [Admin, Produccion, Ventas, Inventario]
+        email:
+          type: string
+        estado:
+          type: string
+          enum: [Activo, Inactivo]

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "MOV-0001",
+    "sku": "TZ-001",
+    "tipoMovimiento": "Entrada",
+    "cantidad": 100,
+    "fecha": "2026-06-01T08:30:00",
+    "responsable": "USR-001",
+    "observacion": "Compra a proveedor principal"
+  },
+  {
+    "id": "MOV-0002",
+    "sku": "TN-004",
+    "tipoMovimiento": "Salida",
+    "cantidad": 1,
+    "fecha": "2026-06-02T10:15:00",
+    "responsable": "USR-002",
+    "observacion": "Uso en orden PED-1001"
+  }
+]

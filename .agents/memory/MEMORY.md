@@ -1,0 +1,1 @@
+- [SIGOS Architecture](sigos-architecture.md) — MVP local usa in-memory store (store.ts); para persistencia migrar a Drizzle+PostgreSQL en lib/db/.

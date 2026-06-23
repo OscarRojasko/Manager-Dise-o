@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "SIGOS - Sublicolor C.A."
+version = "1.0.0"
+id = "artifacts/sigos"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21817
+
+[services.development]
+run = "pnpm --filter @workspace/sigos run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sigos", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/sigos/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21817"
+BASE_PATH = "/"

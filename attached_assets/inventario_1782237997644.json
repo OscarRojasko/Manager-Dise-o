@@ -1,0 +1,58 @@
+[
+  {
+    "sku": "TZ-001",
+    "nombre": "Taza Blanca 11oz",
+    "categoria": "Insumos",
+    "stockActual": 120,
+    "stockMinimo": 50
+  },
+  {
+    "sku": "TZ-002",
+    "nombre": "Taza Mágica Termosensible",
+    "categoria": "Insumos",
+    "stockActual": 15,
+    "stockMinimo": 20
+  },
+  {
+    "sku": "TN-004",
+    "nombre": "Tinta Sublimación Negra",
+    "categoria": "Tintas",
+    "stockActual": 2,
+    "stockMinimo": 5
+  },
+  {
+    "sku": "TN-005",
+    "nombre": "Tinta Sublimación Cyan",
+    "categoria": "Tintas",
+    "stockActual": 8,
+    "stockMinimo": 5
+  },
+  {
+    "sku": "TX-010",
+    "nombre": "Franela Cuello Redondo Blanca (M)",
+    "categoria": "Textil",
+    "stockActual": 45,
+    "stockMinimo": 30
+  },
+  {
+    "sku": "TX-015",
+    "nombre": "Gorra Tipo Camionero (Frente Blanco)",
+    "categoria": "Textil",
+    "stockActual": 12,
+    "stockMinimo": 25
+  },
+  {
+    "sku": "PP-001",
+    "nombre": "Resma Papel Sublimación A4",
+    "categoria": "Papelería",
+    "stockActual": 3,
+    "stockMinimo": 5
+  },
+  {
+    "sku": "AC-001",
+    "nombre": "Cinta Térmica Alta Temperatura",
+    "categoria": "Accesorios",
+    "stockActual": 10,
+    "stockMinimo": 10
+  }
+]

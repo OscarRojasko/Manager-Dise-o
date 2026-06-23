@@ -1,0 +1,229 @@
+import pandas as pd
+import numpy as np
+
+# ==========================================
+# DATOS DE LOS PRODUCTOS
+# ==========================================
+
+productos = {
+    "Llaveros": {
+        "inventario_inicial": 80,
+        "precio_venta": 8,
+        "costo_produccion": 5,
+        "costo_mantenimiento": 0.20,
+        "costo_stockout": 2,
+        "demanda_promedio": 60,
+        "estabilidad": "alta",
+        "s": 30,
+        "Q": 70
+    },
+
+    "Camisetas": {
+        "inventario_inicial": 50,
+        "precio_venta": 20,
+        "costo_produccion": 15,
+        "costo_mantenimiento": 0.50,
+        "costo_stockout": 5,
+        "demanda_promedio": 35,
+        "estabilidad": "media",
+        "s": 20,
+        "Q": 40
+    },
+
+    "Posters": {
+        "inventario_inicial": 40,
+        "precio_venta": 12,
+        "costo_produccion": 8,
+        "costo_mantenimiento": 0.30,
+        "costo_stockout": 3,
+        "demanda_promedio": 25,
+        "estabilidad": "baja",
+        "s": 15,
+        "Q": 30
+    }
+}
+
+# ==========================================
+# CONFIGURACIÓN DE VARIABILIDAD
+# ==========================================
+
+variacion = {
+    "alta": 0.05,
+    "media": 0.10,
+    "baja": 0.20
+}
+
+# ==========================================
+# VARIABLES GLOBALES
+# ==========================================
+
+resultados = []
+
+# 3 iteraciones = 3 meses (trimestre)
+MESES = 3
+
+# ==========================================
+# SIMULACIÓN
+# ==========================================
+
+for nombre, p in productos.items():
+
+    inventario = p["inventario_inicial"]
+
+    ingresos_totales = 0
+    costo_mantenimiento_total = 0
+    costo_produccion_total = 0
+    costo_stockout_total = 0
+
+    pedidos_realizados = 0
+    demanda_total = 0
+    ventas_totales = 0
+
+    reabastecimientos = 0
+    unidades_reabastecidas = 0
+
+    for mes in range(1, MESES + 1):
+
+        # Generación de demanda variable
+        factor = variacion[p["estabilidad"]]
+
+        demanda = round(
+            np.random.normal(
+                p["demanda_promedio"],
+                p["demanda_promedio"] * factor
+            )
+        )
+
+        demanda = max(0, demanda)
+
+        demanda_total += demanda
+
+        # ==================================
+        # VENTAS
+        # ==================================
+
+        ventas = min(inventario, demanda)
+
+        ventas_totales += ventas
+
+        ingresos_mes = ventas * p["precio_venta"]
+        ingresos_totales += ingresos_mes
+
+        inventario -= ventas
+
+        # ==================================
+        # STOCKOUT
+        # ==================================
+
+        faltantes = max(0, demanda - ventas)
+
+        costo_stockout_mes = (
+            faltantes * p["costo_stockout"]
+        )
+
+        costo_stockout_total += costo_stockout_mes
+
+        # ==================================
+        # MANTENIMIENTO
+        # ==================================
+
+        costo_mantenimiento_mes = (
+            inventario * p["costo_mantenimiento"]
+        )
+
+        costo_mantenimiento_total += costo_mantenimiento_mes
+
+        # ==================================
+        # POLÍTICA (s,Q)
+        # ==================================
+
+        if inventario <= p["s"]:
+            inventario += p["Q"]
+
+            pedidos_realizados += 1
+
+            reabastecimientos += 1
+
+            unidades_reabastecidas += p["Q"]
+
+            costo_produccion_total += (
+                    p["Q"] * p["costo_produccion"]
+            )
+
+    # ======================================
+    # RESULTADOS DEL PRODUCTO
+    # ======================================
+
+    gasto_total = (
+            costo_mantenimiento_total
+            + costo_produccion_total
+            + costo_stockout_total
+    )
+
+    ganancia = ingresos_totales - gasto_total
+
+    nivel_servicio = (
+        ventas_totales / demanda_total * 100
+        if demanda_total > 0
+        else 0
+    )
+
+    resultados.append({
+        "Producto": nombre,
+
+        "Demanda Total": demanda_total,
+        "Ventas Totales": ventas_totales,
+
+        "Reabastecimientos": reabastecimientos,
+        "Unidades Reabastecidas": unidades_reabastecidas,
+
+        "Ingresos ($)": round(ingresos_totales, 2),
+
+        "Costo Producción ($)": round(costo_produccion_total, 2),
+        "Costo Mantenimiento ($)": round(costo_mantenimiento_total, 2),
+        "Costo Stockout ($)": round(costo_stockout_total, 2),
+
+        "Gasto Total ($)": round(gasto_total, 2),
+
+        "Ganancia Neta ($)": round(ganancia, 2),
+
+        "Nivel Servicio (%)": round(nivel_servicio, 2),
+
+        "Inventario Final": inventario
+    })
+
+# ==========================================
+# TABLA DE RESULTADOS
+# ==========================================
+
+df_resultados = pd.DataFrame(resultados)
+
+print("\nRESULTADOS DEL TRIMESTRE\n")
+print(df_resultados)
+
+# ==========================================
+# RESUMEN GENERAL
+# ==========================================
+
+resumen = pd.DataFrame({
+    "Métrica": [
+        "Ingresos Totales",
+        "Costo Producción",
+        "Costo Mantenimiento",
+        "Costo Stockout",
+        "Gasto Total",
+        "Ganancia Neta"
+    ],
+
+    "Valor ($)": [
+        df_resultados["Ingresos ($)"].sum(),
+        df_resultados["Costo Producción ($)"].sum(),
+        df_resultados["Costo Mantenimiento ($)"].sum(),
+        df_resultados["Costo Stockout ($)"].sum(),
+        df_resultados["Gasto Total ($)"].sum(),
+        df_resultados["Ganancia Neta ($)"].sum()
+    ]
+})
+
+print("\nRESUMEN GENERAL\n")
+print(resumen)

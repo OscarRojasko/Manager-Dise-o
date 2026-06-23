@@ -1,0 +1,20 @@
+[
+  {
+    "id": "CLI-001",
+    "tipo": "Jurídico",
+    "nombre": "Agencia Creativa C.A.",
+    "documento": "J-123456789",
+    "contacto": "0414-1234567",
+    "email": "compras@agenciacreativa.com",
+    "direccion": "Av. Principal, Valera"
+  },
+  {
+    "id": "CLI-002",
+    "tipo": "Natural",
+    "nombre": "María Pérez",
+    "documento": "V-20123456",
+    "contacto": "0424-9876543",
+    "email": "mariap@email.com",
+    "direccion": "La Puerta, Trujillo"
+  }
+]

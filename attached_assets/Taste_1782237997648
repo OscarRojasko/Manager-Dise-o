@@ -1,0 +1,16 @@
+[
+  {
+    "sku": "TZ-001",
+    "nombre": "Taza Blanca 11oz",
+    "categoria": "Insumos",
+    "stockActual": 120,
+    "stockMinimo": 50
+  },
+  {
+    "sku": "TN-004",
+    "nombre": "Tinta Sublimación Negra",
+    "categoria": "Tintas",
+    "stockActual": 2,
+    "stockMinimo": 5
+  }
+]

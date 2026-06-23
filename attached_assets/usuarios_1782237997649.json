@@ -1,0 +1,16 @@
+[
+  {
+    "id": "USR-001",
+    "nombre": "Administrador Principal",
+    "rol": "Admin",
+    "email": "admin@sublicolor.com",
+    "estado": "Activo"
+  },
+  {
+    "id": "USR-002",
+    "nombre": "Operador de Taller",
+    "rol": "Produccion",
+    "email": "taller@sublicolor.com",
+    "estado": "Activo"
+  }
+]
